@@ -12,6 +12,7 @@ class GMM:
     def __init__(self, k, max_iter: int=5, tol: float=1e-4, covariance_type: Covariance=Covariance.FULL):
         self.k = k
         self.max_iter = max_iter
+        self.tol = tol
         self.log_likelihood_ = []
         self.covariance_type = covariance_type
 

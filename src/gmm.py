@@ -59,6 +59,7 @@ class GMM:
 
         # Compute log-likelihood
         self.log_likelihood = np.sum(np.log(numerator.sum(axis=1) + 1e-10))
+        self.log_likelihood_.append(self.log_likelihood)
 
     
     # M-Step: update meu and sigma
@@ -135,3 +136,27 @@ class GMM:
     def predict(self, X):
         weights = self._predict_proba(X)
         return np.argmax(weights, axis=1)
+
+    
+    def _num_parameters(self):
+        if self.covariance_type == Covariance.FULL:
+            return int(self.k * (self.m + self.m * (self.m + 1) / 2) + (self.k - 1))
+        
+        elif self.covariance_type == Covariance.DIAGONAL:
+            return int(self.k * (2 * self.m) + (self.k - 1))
+        
+        elif self.covariance_type == Covariance.SPHERICAL:
+            return int(self.k * (self.m + 1) + (self.k - 1))
+        
+        elif self.covariance_type == Covariance.TIED:
+            return int(self.k * self.m + (self.m * (self.m + 1) / 2) + (self.k - 1))
+    
+    def bic(self, X):
+        n = X.shape[0]
+        p = self._num_parameters()
+        return -2 * self.log_likelihood + p * np.log(n)
+
+
+    def aic(self, X):
+        p = self._num_parameters()
+        return -2 * self.log_likelihood + 2 * p

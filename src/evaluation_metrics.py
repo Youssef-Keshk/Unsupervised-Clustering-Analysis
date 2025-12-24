@@ -1,5 +1,5 @@
 import numpy as np
-from gmm import Covariance
+from src.gmm import Covariance
 
 # INTERNAL VALIDATION METRICS
 
@@ -39,7 +39,7 @@ def silhouette_score(X, labels):
     return np.mean(s)
 
 
-def davies_bouldin_index(X, labels):
+def davies_bouldin_score(X, labels):
     """
     Davies-Bouldin Index implementation.
     Lower is better.
@@ -66,7 +66,7 @@ def davies_bouldin_index(X, labels):
     return np.mean(D)
 
 
-def calinski_harabasz_index(X, labels):
+def calinski_harabasz_score(X, labels):
     """
     CH Index implementation.
     Higher is better.
@@ -139,7 +139,7 @@ def adjusted_rand_index(y_true, y_pred):
     return (sum_comb_c - expected_index) / (max_index - expected_index + 1e-10)
 
 
-def normalized_mutual_information(y_true, y_pred):
+def normalized_mutual_info(y_true, y_pred):
     """
     NMI implementation.
     """

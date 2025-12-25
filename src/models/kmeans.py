@@ -53,10 +53,10 @@ class KMeans:
         return np.argmin(distances, axis=1)
 
 
-    def _compute_means(self, cluster_idx):
+    def _compute_means(self):
         _, n = np.shape(self.X)
         for k in range(self.K):
-            points = self.X[cluster_idx == k] # gather points for the cluster i
+            points = self.X[self.clusters == k] # gather points for the cluster i
             if len(points) == 0:
                 self.centroids[k] = self.X[np.random.randint(len(self.X))]
             else:

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from .metrics import *
 
 
 def load_scale_data(data_path):
@@ -45,3 +46,16 @@ def align_clusters_with_labels(y_true, y_pred):
             most_frequent = np.bincount(labels_in_cluster).argmax()
             mapped_predictions[y_pred == cluster] = most_frequent
     return mapped_predictions
+
+
+def evaluate_clustering(X_latent, y_true, y_pred, model):
+    """Computes a dictionary of all required metrics."""
+    return {
+        'ARI': compute_ari(y_true, y_pred),
+        'NMI': compute_nmi(y_true, y_pred),
+        'Purity': purity_score(y_true, y_pred),
+        'Silhouette': compute_silhouette_score(X_latent, y_pred),
+        'Log-Likelihood': model.log_likelihood_[-1],
+        'BIC': model.bic(X_latent),
+        'AIC': model.aic(X_latent)
+    }

@@ -7,44 +7,19 @@ class Autoencoder:
     """
     
     def __init__(
-        self,
-        input_dim: int,
-        encoding_dims: List[int],
-        bottleneck_dim: int,
-        activation: str = 'relu',
-        learning_rate: float = 0.01,
-        batch_size: int = 32,
-        epochs: int = 100,
-        l2_lambda: float = 0.01,
-        lr_decay: float = 0.95,
-        random_state: Optional[int] = None
-    ):
-        """
-        Initialize Autoencoder.
-        
-        Parameters:
-        -----------
-        input_dim : int
-            Dimension of input data
-        encoding_dims : List[int]
-            Dimensions of hidden layers in encoder (excluding bottleneck)
-        bottleneck_dim : int
-            Dimension of bottleneck (latent space)
-        activation : str
-            Activation function ('relu', 'sigmoid', 'tanh')
-        learning_rate : float
-            Initial learning rate
-        batch_size : int
-            Batch size for mini-batch gradient descent
-        epochs : int
-            Number of training epochs
-        l2_lambda : float
-            L2 regularization parameter
-        lr_decay : float
-            Learning rate decay factor per epoch
-        random_state : int, optional
-            Random seed for reproducibility
-        """
+            self,
+            input_dim: int,
+            encoding_dims: List[int],
+            bottleneck_dim: int,
+            activation: str = 'relu',
+            learning_rate: float = 0.01,
+            batch_size: int = 32,
+            epochs: int = 100,
+            l2_lambda: float = 0.01,
+            lr_decay: float = 0.95,
+            random_state: Optional[int] = None
+        ):
+
         self.input_dim = input_dim
         self.encoding_dims = encoding_dims
         self.bottleneck_dim = bottleneck_dim
@@ -90,6 +65,7 @@ class Autoencoder:
             b = np.zeros((1, self.decoder_dims[i+1]))
             self.decoder_weights.append(w)
             self.decoder_biases.append(b)
+
     
     def _activation_forward(self, x: np.ndarray) -> np.ndarray:
         """Apply activation function."""
@@ -117,15 +93,6 @@ class Autoencoder:
     def _forward_pass(self, X: np.ndarray) -> Tuple[np.ndarray, List, List]:
         """
         Forward pass through the network.
-        
-        Returns:
-        --------
-        output : np.ndarray
-            Reconstructed output
-        activations : List
-            Activations at each layer
-        z_values : List
-            Pre-activation values
         """
         activations = [X]
         z_values = []
@@ -162,17 +129,6 @@ class Autoencoder:
     ) -> Tuple[List, List, List, List]:
         """
         Backward pass through the network.
-        
-        Returns:
-        --------
-        encoder_weight_grads : List
-            Gradients for encoder weights
-        encoder_bias_grads : List
-            Gradients for encoder biases
-        decoder_weight_grads : List
-            Gradients for decoder weights
-        decoder_bias_grads : List
-            Gradients for decoder biases
         """
         n_samples = X.shape[0]
         
@@ -233,17 +189,6 @@ class Autoencoder:
     def fit(self, X: np.ndarray, verbose: bool = True) -> 'Autoencoder':
         """
         Train the autoencoder.
-        
-        Parameters:
-        -----------
-        X : np.ndarray of shape (n_samples, n_features)
-            Training data
-        verbose : bool
-            Whether to print training progress
-            
-        Returns:
-        --------
-        self : Autoencoder
         """
         n_samples = X.shape[0]
         
@@ -302,16 +247,6 @@ class Autoencoder:
     def encode(self, X: np.ndarray) -> np.ndarray:
         """
         Encode data to bottleneck representation.
-        
-        Parameters:
-        -----------
-        X : np.ndarray of shape (n_samples, n_features)
-            Data to encode
-            
-        Returns:
-        --------
-        encoded : np.ndarray of shape (n_samples, bottleneck_dim)
-            Encoded representation
         """
         current = X
         for i in range(len(self.encoder_weights)):
@@ -322,16 +257,6 @@ class Autoencoder:
     def decode(self, encoded: np.ndarray) -> np.ndarray:
         """
         Decode from bottleneck representation.
-        
-        Parameters:
-        -----------
-        encoded : np.ndarray of shape (n_samples, bottleneck_dim)
-            Encoded representation
-            
-        Returns:
-        --------
-        decoded : np.ndarray of shape (n_samples, n_features)
-            Decoded (reconstructed) data
         """
         current = encoded
         for i in range(len(self.decoder_weights) - 1):
@@ -345,16 +270,6 @@ class Autoencoder:
     def reconstruct(self, X: np.ndarray) -> np.ndarray:
         """
         Reconstruct data (encode then decode).
-        
-        Parameters:
-        -----------
-        X : np.ndarray of shape (n_samples, n_features)
-            Data to reconstruct
-            
-        Returns:
-        --------
-        reconstructed : np.ndarray of shape (n_samples, n_features)
-            Reconstructed data
         """
         encoded = self.encode(X)
         return self.decode(encoded)
@@ -362,78 +277,6 @@ class Autoencoder:
     def reconstruction_error(self, X: np.ndarray) -> float:
         """
         Compute reconstruction error (MSE).
-        
-        Parameters:
-        -----------
-        X : np.ndarray of shape (n_samples, n_features)
-            Original data
-            
-        Returns:
-        --------
-        error : float
-            Mean squared reconstruction error
         """
         reconstructed = self.reconstruct(X)
         return np.mean((X - reconstructed) ** 2)
-
-
-# Example usage
-if __name__ == "__main__":
-    # Generate sample data
-    np.random.seed(42)
-    X = np.random.randn(100, 30)
-    
-    # Test Autoencoder
-    print("=" * 50)
-    print("Testing Autoencoder")
-    print("=" * 50)
-    autoencoder = Autoencoder(
-        input_dim=30,
-        encoding_dims=[20, 15],
-        bottleneck_dim=10,
-        activation='relu',
-        learning_rate=0.01,
-        batch_size=32,
-        epochs=50,
-        l2_lambda=0.001,
-        random_state=42
-    )
-    
-    print(f"Architecture:")
-    print(f"  Encoder: {autoencoder.encoder_dims}")
-    print(f"  Decoder: {autoencoder.decoder_dims}")
-    print()
-    
-    autoencoder.fit(X, verbose=True)
-    
-    X_encoded = autoencoder.encode(X)
-    X_reconstructed = autoencoder.reconstruct(X)
-    
-    print(f"\n{'=' * 50}")
-    print(f"Results:")
-    print(f"{'=' * 50}")
-    print(f"Original shape: {X.shape}")
-    print(f"Encoded shape: {X_encoded.shape}")
-    print(f"Reconstructed shape: {X_reconstructed.shape}")
-    print(f"Reconstruction error: {autoencoder.reconstruction_error(X):.6f}")
-    print(f"Final training loss: {autoencoder.train_loss_history[-1]:.6f}")
-    
-    # Test with different bottleneck dimensions
-    print("\n" + "=" * 50)
-    print("Testing with different bottleneck dimensions")
-    print("=" * 50)
-    for bottleneck in [2, 5, 10, 15, 20]:
-        ae = Autoencoder(
-            input_dim=30,
-            encoding_dims=[20, 15],
-            bottleneck_dim=bottleneck,
-            activation='relu',
-            learning_rate=0.01,
-            batch_size=32,
-            epochs=30,
-            l2_lambda=0.001,
-            random_state=42
-        )
-        ae.fit(X, verbose=False)
-        error = ae.reconstruction_error(X)
-        print(f"Bottleneck: {bottleneck:2d} | Reconstruction Error: {error:.6f} | Final Loss: {ae.train_loss_history[-1]:.6f}")
